@@ -124,7 +124,7 @@ const renderTourStop = (stop: any) => (
         Contents:
       </Typography>
       <Box>
-        {stop.contents.map((content: any) => (
+        {stop.contents?.map((content: any) => (
           <Box key={content.position} sx={{ mb: 3 }}>
             <Paper sx={{ p: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -187,6 +187,42 @@ export default function DataDisplay<T extends { id: string }>({
     message: string;
     severity: 'success' | 'error';
   }>({ open: false, message: '', severity: 'success' });
+
+  // Ensure data is an array and handle undefined/null cases
+  const safeData = Array.isArray(data) ? data : [];
+
+  // Show loading state
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // Show empty state
+  if (!safeData || safeData.length === 0) {
+    return (
+      <Paper
+        sx={{
+          p: 4,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: 200,
+          backgroundColor: 'background.paper',
+        }}
+      >
+        <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+          No Data Found
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          There are no items to display at the moment.
+        </Typography>
+      </Paper>
+    );
+  }
 
   const handleItemClick = async (item: T) => {
     setDetailsLoading(true);
@@ -314,29 +350,6 @@ export default function DataDisplay<T extends { id: string }>({
     return String(value);
   };
 
-  if (data.length === 0) {
-    return (
-      <Paper
-        sx={{
-          p: 4,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minHeight: 200,
-          backgroundColor: 'background.paper',
-        }}
-      >
-        <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-          No Data Found
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          There are no items to display at the moment.
-        </Typography>
-      </Paper>
-    );
-  }
-
   return (
     <Box>
       <Typography variant="h6" gutterBottom>
@@ -345,8 +358,8 @@ export default function DataDisplay<T extends { id: string }>({
 
       <Paper>
         <List>
-          {data.map((item, index) => (
-            <Box key={item.id}>
+          {safeData.map((item, index) => (
+            <Box key={item.id || index}>
               {index > 0 && <Divider />}
               <ListItem
                 component="div"

@@ -20,18 +20,23 @@ export default function Tours() {
   }, []);
 
   const loadTours = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const response = await tours.getAll();
-      setToursList(response.data);
+      // Ensure we have an array of tours
+      setToursList(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error loading tours:', error);
       setError('Failed to load tours');
+      setToursList([]); // Reset to empty array on error
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
+    setLoading(true);
     try {
       await tours.delete(id);
       setToursList(prev => prev.filter(tour => tour.id !== id));
@@ -40,10 +45,13 @@ export default function Tours() {
       console.error('Error deleting tour:', error);
       setError('Failed to delete tour');
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSubmit = async (data: Partial<Tour>) => {
+    setLoading(true);
     try {
       const tourData = {
         title: data.title || '',
@@ -55,18 +63,25 @@ export default function Tours() {
         startingAddress: data.startingAddress || '',
         stops: data.stops || [],
       };
-      const response = await tours.create(tourData);
+      await tours.create(tourData);
       await loadTours();
       setShowCreate(false);
       setSuccess('Tour created successfully');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create tour');
+    } finally {
+      setLoading(false);
     }
   };
 
   const fetchFullDetails = async (id: string) => {
-    const response = await tours.getById(id);
-    return response.data;
+    try {
+      const response = await tours.getById(id);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching tour details:', error);
+      throw error;
+    }
   };
 
   return (
@@ -79,6 +94,7 @@ export default function Tours() {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setShowCreate(!showCreate)}
+          disabled={loading}
         >
           {showCreate ? 'Cancel' : 'Create Tour'}
         </Button>
