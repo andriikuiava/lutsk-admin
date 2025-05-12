@@ -20,7 +20,7 @@ interface PlaceFormProps {
 
 export default function PlaceForm({ onSubmit, initialData }: PlaceFormProps) {
   const [title, setTitle] = useState(initialData?.title || '');
-  const [type, setType] = useState(initialData?.type || 'HISTORICAL');
+  const [type, setType] = useState(initialData?.type || 'TAG10');
   const [description, setDescription] = useState(initialData?.description || '');
   const [latitude, setLatitude] = useState(initialData?.latitude?.toString() || '');
   const [longitude, setLongitude] = useState(initialData?.longitude?.toString() || '');
@@ -34,7 +34,7 @@ export default function PlaceForm({ onSubmit, initialData }: PlaceFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData();
-    
+
     // Append all text fields
     formData.append('title', title);
     formData.append('type', type);
@@ -81,12 +81,16 @@ export default function PlaceForm({ onSubmit, initialData }: PlaceFormProps) {
           label="Type"
           onChange={(e) => setType(e.target.value)}
         >
-          <MenuItem value="HISTORICAL">Historical</MenuItem>
-          <MenuItem value="CULTURAL">Cultural</MenuItem>
-          <MenuItem value="NATURAL">Natural</MenuItem>
-          <MenuItem value="ENTERTAINMENT">Entertainment</MenuItem>
-          <MenuItem value="SHOPPING">Shopping</MenuItem>
-          <MenuItem value="FOOD">Food</MenuItem>
+            <MenuItem value="TAG1">TAG1</MenuItem>
+            <MenuItem value="TAG2">TAG2</MenuItem>
+            <MenuItem value="TAG3">TAG3</MenuItem>
+            <MenuItem value="TAG4">TAG4</MenuItem>
+            <MenuItem value="TAG5">TAG5</MenuItem>
+            <MenuItem value="TAG6">TAG6</MenuItem>
+            <MenuItem value="TAG7">TAG7</MenuItem>
+            <MenuItem value="TAG8">TAG8</MenuItem>
+            <MenuItem value="TAG9">TAG9</MenuItem>
+            <MenuItem value="TAG10">TAG10</MenuItem>
         </Select>
       </FormControl>
       <TextField
@@ -150,7 +154,7 @@ export default function PlaceForm({ onSubmit, initialData }: PlaceFormProps) {
         required
         fullWidth
       />
-      
+
       {/* File upload section */}
       <Box>
         <input
@@ -166,7 +170,7 @@ export default function PlaceForm({ onSubmit, initialData }: PlaceFormProps) {
             Upload Images
           </Button>
         </label>
-        
+
         {/* Display selected files */}
         <Box sx={{ mt: 2 }}>
           {imageFiles.map((file, index) => (

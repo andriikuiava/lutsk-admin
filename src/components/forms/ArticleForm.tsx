@@ -23,7 +23,7 @@ interface ArticleFormProps {
 
 export default function ArticleForm({ onSubmit, initialData }: ArticleFormProps) {
   const [title, setTitle] = useState(initialData?.title || '');
-  const [articleType, setArticleType] = useState(initialData?.articleType || 'HISTORICAL');
+  const [articleType, setArticleType] = useState(initialData?.articleType || 'TAG10');
   const [mainImage, setMainImage] = useState(initialData?.mainImage || '');
   const [contents, setContents] = useState<ArticleContent[]>(initialData?.contents || [
     {
@@ -96,9 +96,16 @@ export default function ArticleForm({ onSubmit, initialData }: ArticleFormProps)
             label="Article Type"
             onChange={(e) => setArticleType(e.target.value)}
           >
-            <MenuItem value="HISTORICAL">Historical</MenuItem>
-            <MenuItem value="CULTURAL">Cultural</MenuItem>
-            <MenuItem value="TRAVEL">Travel</MenuItem>
+            <MenuItem value="TAG1">TAG1</MenuItem>
+            <MenuItem value="TAG2">TAG2</MenuItem>
+            <MenuItem value="TAG3">TAG3</MenuItem>
+            <MenuItem value="TAG4">TAG4</MenuItem>
+            <MenuItem value="TAG5">TAG5</MenuItem>
+            <MenuItem value="TAG6">TAG6</MenuItem>
+            <MenuItem value="TAG7">TAG7</MenuItem>
+            <MenuItem value="TAG8">TAG8</MenuItem>
+            <MenuItem value="TAG9">TAG9</MenuItem>
+            <MenuItem value="TAG10">TAG10</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -211,4 +218,4 @@ export default function ArticleForm({ onSubmit, initialData }: ArticleFormProps)
       </Box>
     </Box>
   );
-} 
+}
