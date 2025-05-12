@@ -43,23 +43,9 @@ export default function Places() {
     }
   };
 
-  const handleSubmit = async (data: Partial<Place>) => {
+  const handleSubmit = async (formData: FormData) => {
     try {
-      // Ensure all required fields are present
-      const placeData = {
-        title: data.title || '',
-        type: data.type || 'HISTORICAL',
-        description: data.description || '',
-        images: data.images || [],
-        latitude: data.latitude || 0,
-        longitude: data.longitude || 0,
-        link: data.link || '',
-        price: data.price || 0,
-        phone: data.phone || '',
-        googleMapsLink: data.googleMapsLink || '',
-        address: data.address || '',
-      };
-      const response = await places.create(placeData);
+      const response = await places.create(formData);
       await loadPlaces();
       setShowCreate(false);
       setSuccess('Place created successfully');

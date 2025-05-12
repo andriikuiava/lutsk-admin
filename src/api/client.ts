@@ -133,7 +133,11 @@ export const users = {
 export const places = {
   getAll: () => api.get<Place[]>('/places'),
   getById: (id: string) => api.get<Place>(`/places/${id}`),
-  create: (data: Omit<Place, 'id'>) => api.post<Place>('/places', data),
+  create: (formData: FormData) => api.post<Place>('/places', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
   delete: (id: string) => api.delete(`/places/${id}`),
 };
 
@@ -141,7 +145,11 @@ export const places = {
 export const events = {
   getAll: () => api.get<Event[]>('/events'),
   getById: (id: string) => api.get<Event>(`/events/${id}`),
-  create: (data: Omit<Event, 'id' | 'timePublished'>) => api.post<Event>('/events', data),
+  create: (formData: FormData) => api.post<Event>('/events', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
   delete: (id: string) => api.delete(`/events/${id}`),
 };
 

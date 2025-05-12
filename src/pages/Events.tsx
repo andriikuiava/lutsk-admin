@@ -43,22 +43,9 @@ export default function Events() {
     }
   };
 
-  const handleSubmit = async (data: Partial<Event>) => {
+  const handleSubmit = async (formData: FormData) => {
     try {
-      // Ensure all required fields are present
-      const eventData = {
-        title: data.title || '',
-        description: data.description || '',
-        images: data.images || [],
-        latitude: data.latitude || 0,
-        longitude: data.longitude || 0,
-        eventTime: data.eventTime || new Date().toISOString(),
-        link: data.link || '',
-        price: data.price || '',
-        address: data.address || '',
-        phone: data.phone || '',
-      };
-      const response = await events.create(eventData);
+      const response = await events.create(formData);
       await loadEvents();
       setShowCreate(false);
       setSuccess('Event created successfully');

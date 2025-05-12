@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/api': {
-          target: env.VITE_API_BASE_URL || 'https://nataliakuiava.com',
+          target: env.VITE_API_BASE_URL || 'http://localhost:8080',
           changeOrigin: true,
           secure: false,
           configure: (proxy, _options) => {
@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
     },
     // Define environment variables to ensure they're available during build time
     define: {
-      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(env.VITE_API_BASE_URL || 'https://nataliakuiava.com'),
+      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(env.VITE_API_BASE_URL || 'http://localhost:8080'),
     },
   }
 })
