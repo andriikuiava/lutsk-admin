@@ -1,7 +1,10 @@
 import axios from 'axios';
 import type { AuthResponse, User, Place, Event, Article, Tour, UploadResponse, IAPVerification } from '../types/api';
 
-const API_BASE_URL = '/api';
+// Use environment variable or fallback to absolute URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+    ? `${import.meta.env.VITE_API_BASE_URL}/api`
+    : 'https://nataliakuiava.com/api';
 
 // Token refresh threshold (5 minutes in milliseconds)
 const TOKEN_REFRESH_THRESHOLD = 5 * 60 * 1000;
@@ -36,7 +39,7 @@ const refreshToken = async (): Promise<void> => {
     const response = await axios.post<AuthResponse>(`${API_BASE_URL}/auth/refresh-token`, {
       refreshToken,
     });
-    
+
     const { accessToken, refreshToken: newRefreshToken } = response.data;
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', newRefreshToken);
@@ -52,7 +55,7 @@ const refreshToken = async (): Promise<void> => {
 // Add token to requests and handle refresh
 api.interceptors.request.use(async (config) => {
   const token = localStorage.getItem('accessToken');
-  
+
   if (token) {
     // Check if token needs refresh
     if (isTokenExpired(token)) {
@@ -66,59 +69,59 @@ api.interceptors.request.use(async (config) => {
       config.headers.Authorization = `Bearer ${token}`;
     }
   }
-  
+
   return config;
 });
 
 // Handle CORS errors
 api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (error.response?.status === 403 && error.config.method === 'options') {
-      // Retry the request without the preflight
-      return axios({
-        ...error.config,
-        headers: {
-          ...error.config.headers,
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
-    }
-
-    // Handle 401 Unauthorized errors
-    if (error.response?.status === 401 && !error.config._retry) {
-      error.config._retry = true;
-      try {
-        await refreshToken();
-        // Retry the original request with new token
-        const newToken = localStorage.getItem('accessToken');
-        error.config.headers.Authorization = `Bearer ${newToken}`;
-        return axios(error.config);
-      } catch (refreshError) {
-        return Promise.reject(refreshError);
+    (response) => response,
+    async (error) => {
+      if (error.response?.status === 403 && error.config.method === 'options') {
+        // Retry the request without the preflight
+        return axios({
+          ...error.config,
+          headers: {
+            ...error.config.headers,
+            'Access-Control-Allow-Origin': '*',
+          },
+        });
       }
-    }
 
-    return Promise.reject(error);
-  }
+      // Handle 401 Unauthorized errors
+      if (error.response?.status === 401 && !error.config._retry) {
+        error.config._retry = true;
+        try {
+          await refreshToken();
+          // Retry the original request with new token
+          const newToken = localStorage.getItem('accessToken');
+          error.config.headers.Authorization = `Bearer ${newToken}`;
+          return axios(error.config);
+        } catch (refreshError) {
+          return Promise.reject(refreshError);
+        }
+      }
+
+      return Promise.reject(error);
+    }
 );
 
 // Auth endpoints
 export const auth = {
   register: (data: { email: string; password: string; fullName: string }) =>
-    api.post<AuthResponse>('/auth/register', data),
+      api.post<AuthResponse>('/auth/register', data),
   login: (data: { email: string; password: string }) =>
-    api.post<AuthResponse>('/auth/login', data),
+      api.post<AuthResponse>('/auth/login', data),
   apple: (data: { identityToken: string }) =>
-    api.post<AuthResponse>('/auth/apple', data),
+      api.post<AuthResponse>('/auth/apple', data),
   google: (data: { idToken: string }) =>
-    api.post<AuthResponse>('/auth/google', data),
+      api.post<AuthResponse>('/auth/google', data),
   refreshToken: (data: { refreshToken: string }) =>
-    api.post<AuthResponse>('/auth/refresh-token', data),
+      api.post<AuthResponse>('/auth/refresh-token', data),
   changePassword: (data: { oldPassword: string; newPassword: string }) =>
-    api.post<AuthResponse>('/auth/change-password', data),
+      api.post<AuthResponse>('/auth/change-password', data),
   deleteUser: (data: { password: string }) =>
-    api.delete('/auth/user', { data }),
+      api.delete('/auth/user', { data }),
 };
 
 // User endpoints
@@ -225,4 +228,4 @@ export const uploads = {
 // IAP endpoints
 export const iap = {
   verify: (data: IAPVerification) => api.post('/iap/verify', data),
-}; 
+};

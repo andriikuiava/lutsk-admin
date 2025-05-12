@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://nataliakuiava.com';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://nataliakuiava.com',
+  baseURL: API_BASE_URL,
 });
 
 export const uploads = {

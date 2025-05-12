@@ -16,8 +16,8 @@ export default function EventForm({ onSubmit, initialData }: EventFormProps) {
   const [title, setTitle] = useState(initialData?.title || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [images, setImages] = useState<string[]>(initialData?.images || []);
-  const [latitude, setLatitude] = useState(initialData?.latitude || 0);
-  const [longitude, setLongitude] = useState(initialData?.longitude || 0);
+  const [latitude, setLatitude] = useState(initialData?.latitude?.toString() || '');
+  const [longitude, setLongitude] = useState(initialData?.longitude?.toString() || '');
   const [eventTime, setEventTime] = useState(initialData?.eventTime || new Date().toISOString().slice(0, 16));
   const [link, setLink] = useState(initialData?.link || '');
   const [price, setPrice] = useState(initialData?.price || '');
@@ -30,8 +30,8 @@ export default function EventForm({ onSubmit, initialData }: EventFormProps) {
       title,
       description,
       images,
-      latitude,
-      longitude,
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
       eventTime,
       link,
       price,
@@ -66,24 +66,25 @@ export default function EventForm({ onSubmit, initialData }: EventFormProps) {
         helperText="Enter image URLs separated by commas"
       />
       <Box sx={{ display: 'flex', gap: 2 }}>
-        <TextField
-          label="Latitude"
-          value={latitude}
-          onChange={(e) => setLatitude(Number(e.target.value))}
-          required
-          fullWidth
-          type="number"
-          inputProps={{ step: 'any' }}
-        />
-        <TextField
-          label="Longitude"
-          value={longitude}
-          onChange={(e) => setLongitude(Number(e.target.value))}
-          required
-          fullWidth
-          type="number"
-          inputProps={{ step: 'any' }}
-        />
+          <TextField
+              label="Latitude"
+              value={latitude}
+              onChange={(e) => setLatitude(e.target.value)}
+              required
+              fullWidth
+              type="number"
+              inputProps={{ step: 'any' }}
+          />
+          <TextField
+              label="Longitude"
+              value={longitude}
+              onChange={(e) => setLongitude(e.target.value)}
+              required
+              fullWidth
+              type="number"
+              inputProps={{ step: 'any' }}
+          />
+
       </Box>
       <TextField
         label="Event Time"
@@ -101,7 +102,7 @@ export default function EventForm({ onSubmit, initialData }: EventFormProps) {
         fullWidth
       />
       <TextField
-        label="Price"
+        label="Price (string)"
         value={price}
         onChange={(e) => setPrice(e.target.value)}
         fullWidth
@@ -124,4 +125,4 @@ export default function EventForm({ onSubmit, initialData }: EventFormProps) {
       </Button>
     </Box>
   );
-} 
+}

@@ -21,8 +21,8 @@ export default function PlaceForm({ onSubmit, initialData }: PlaceFormProps) {
   const [type, setType] = useState(initialData?.type || 'HISTORICAL');
   const [description, setDescription] = useState(initialData?.description || '');
   const [images, setImages] = useState<string[]>(initialData?.images || []);
-  const [latitude, setLatitude] = useState(initialData?.latitude || 0);
-  const [longitude, setLongitude] = useState(initialData?.longitude || 0);
+  const [latitude, setLatitude] = useState(initialData?.latitude?.toString() || '');
+  const [longitude, setLongitude] = useState(initialData?.longitude?.toString() || '');
   const [link, setLink] = useState(initialData?.link || '');
   const [price, setPrice] = useState(initialData?.price || 0);
   const [phone, setPhone] = useState(initialData?.phone || '');
@@ -36,8 +36,8 @@ export default function PlaceForm({ onSubmit, initialData }: PlaceFormProps) {
       type,
       description,
       images,
-      latitude,
-      longitude,
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
       link,
       price,
       phone,
@@ -90,7 +90,7 @@ export default function PlaceForm({ onSubmit, initialData }: PlaceFormProps) {
         <TextField
           label="Latitude"
           value={latitude}
-          onChange={(e) => setLatitude(Number(e.target.value))}
+          onChange={(e) => setLatitude(e.target.value)}
           required
           fullWidth
           type="number"
@@ -113,7 +113,7 @@ export default function PlaceForm({ onSubmit, initialData }: PlaceFormProps) {
         fullWidth
       />
       <TextField
-        label="Price"
+        label="Price (1-4)"
         value={price}
         onChange={(e) => setPrice(Number(e.target.value))}
         fullWidth
@@ -143,4 +143,4 @@ export default function PlaceForm({ onSubmit, initialData }: PlaceFormProps) {
       </Button>
     </Box>
   );
-} 
+}
