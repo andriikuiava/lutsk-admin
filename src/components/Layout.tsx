@@ -24,6 +24,7 @@ import {
   CloudUpload as UploadIcon,
   Logout as LogoutIcon,
   People as PeopleIcon,
+  LocalOffer as PromoIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -63,6 +64,7 @@ export default function Layout({ children }: LayoutProps) {
     { text: 'Events', icon: <EventIcon />, path: '/events' },
     { text: 'Articles', icon: <ArticleIcon />, path: '/articles' },
     { text: 'Tours', icon: <TourIcon />, path: '/tours' },
+    { text: 'Promo Codes', icon: <PromoIcon />, path: '/promocodes' },
     { text: 'Users', icon: <PeopleIcon />, path: '/users' },
     { text: 'Uploads', icon: <UploadIcon />, path: '/uploads' },
   ];

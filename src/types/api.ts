@@ -108,4 +108,14 @@ export type IAPVerification = {
   purchaseToken: string;
   productId: string;
   source: 'GOOGLE_PLAY' | string;
+};
+
+export type PromoCode = {
+  id: string;
+  code: string;
+  maxActivations: number;
+  currentActivations: number;
+  expiryDate: string;
+  active: boolean;
+  tourId: string;
 }; 

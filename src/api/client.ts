@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AuthResponse, User, Place, Event, Article, Tour, UploadResponse, IAPVerification, UserInfo } from '../types/api';
+import type { AuthResponse, User, Place, Event, Article, Tour, UploadResponse, IAPVerification, UserInfo, PromoCode } from '../types/api';
 
 // Use environment variable or fallback to absolute URL
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -259,4 +259,12 @@ export const uploads = {
 // IAP endpoints
 export const iap = {
   verify: (data: IAPVerification) => api.post('/iap/verify', data),
+};
+
+// PromoCode endpoints
+export const promos = {
+  getAll: () => api.get<PromoCode[]>('/promo'),
+  create: (data: Omit<PromoCode, 'id' | 'currentActivations'>) => api.post<PromoCode>('/promo/create', data),
+  update: (id: string, data: Partial<PromoCode>) => api.put<PromoCode>(`/promo/${id}`, data),
+  sendEmails: (data: { promoCodeId: string, emails: string[] }) => api.post('/promo/send', data),
 };

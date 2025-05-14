@@ -34,6 +34,12 @@ import {
   Article as ArticleIcon,
 } from '@mui/icons-material';
 
+interface ExtraAction<T> {
+  label: string;
+  icon: React.ReactNode;
+  onClick: (id: string) => void;
+}
+
 interface DataDisplayProps<T> {
   title: string;
   data: T[];
@@ -43,6 +49,7 @@ interface DataDisplayProps<T> {
   getItemSubtitle?: (item: T) => string;
   getItemDetails?: (item: T) => Record<string, any>;
   fetchFullDetails: (id: string) => Promise<T>;
+  extraActions?: ExtraAction<T>[];
 }
 
 const renderArticleContent = (content: any) => (
@@ -178,6 +185,7 @@ export default function DataDisplay<T extends { id: string }>({
   getItemSubtitle,
   getItemDetails,
   fetchFullDetails,
+  extraActions,
 }: DataDisplayProps<T>) {
   const [selectedItem, setSelectedItem] = useState<T | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -373,6 +381,17 @@ export default function DataDisplay<T extends { id: string }>({
               secondary={getItemSubtitle?.(item)}
             />
             <Box sx={{ display: 'flex', gap: 1 }}>
+              {extraActions?.map((action, index) => (
+                <Button
+                  key={index}
+                  variant="outlined"
+                  size="small"
+                  startIcon={action.icon}
+                  onClick={() => action.onClick(item.id)}
+                >
+                  {action.label}
+                </Button>
+              ))}
               {onEdit && (
                 <Button
                   variant="outlined"

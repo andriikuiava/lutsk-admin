@@ -12,6 +12,7 @@ import Uploads from './pages/Uploads';
 import AddArticle from './pages/AddArticle';
 import AddTour from './pages/AddTour';
 import Users from './pages/Users';
+import PromoCodes from './pages/PromoCodes';
 
 const theme = createTheme({
   palette: {
@@ -234,6 +235,16 @@ export default function App() {
                   <PrivateRoute>
                     <Layout>
                       <Users />
+                    </Layout>
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/promocodes"
+                element={
+                  <PrivateRoute>
+                    <Layout>
+                      <PromoCodes />
                     </Layout>
                   </PrivateRoute>
                 }
