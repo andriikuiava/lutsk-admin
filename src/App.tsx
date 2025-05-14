@@ -8,10 +8,10 @@ import Places from './pages/Places';
 import Events from './pages/Events';
 import Articles from './pages/Articles';
 import Tours from './pages/Tours';
-import Settings from './pages/Settings';
 import Uploads from './pages/Uploads';
 import AddArticle from './pages/AddArticle';
 import AddTour from './pages/AddTour';
+import Users from './pages/Users';
 
 const theme = createTheme({
   palette: {
@@ -229,11 +229,11 @@ export default function App() {
                 }
               />
               <Route
-                path="/settings"
+                path="/users"
                 element={
                   <PrivateRoute>
                     <Layout>
-                      <Settings />
+                      <Users />
                     </Layout>
                   </PrivateRoute>
                 }

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AuthResponse, User, Place, Event, Article, Tour, UploadResponse, IAPVerification } from '../types/api';
+import type { AuthResponse, User, Place, Event, Article, Tour, UploadResponse, IAPVerification, UserInfo } from '../types/api';
 
 // Use environment variable or fallback to absolute URL
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -127,6 +127,17 @@ export const auth = {
 // User endpoints
 export const users = {
   getMe: () => api.get<User>('/users/me'),
+};
+
+// Admin user endpoints
+export const adminUsers = {
+  getAll: () => api.get<UserInfo[]>('/admin/users'),
+  grantTourAccess: (userId: number, tourId: string) =>
+    api.post(`/admin/users/${userId}/tours/${tourId}`),
+  revokeTourAccess: (userId: number, tourId: string) =>
+    api.delete(`/admin/users/${userId}/tours/${tourId}`),
+  deleteUser: (userId: number) =>
+    api.delete(`/admin/users/${userId}`),
 };
 
 // Places endpoints

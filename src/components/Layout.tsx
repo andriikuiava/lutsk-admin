@@ -22,8 +22,8 @@ import {
   Article as ArticleIcon,
   Tour as TourIcon,
   CloudUpload as UploadIcon,
-  Settings as SettingsIcon,
   Logout as LogoutIcon,
+  People as PeopleIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -63,6 +63,7 @@ export default function Layout({ children }: LayoutProps) {
     { text: 'Events', icon: <EventIcon />, path: '/events' },
     { text: 'Articles', icon: <ArticleIcon />, path: '/articles' },
     { text: 'Tours', icon: <TourIcon />, path: '/tours' },
+    { text: 'Users', icon: <PeopleIcon />, path: '/users' },
     { text: 'Uploads', icon: <UploadIcon />, path: '/uploads' },
   ];
 
@@ -109,35 +110,6 @@ export default function Layout({ children }: LayoutProps) {
       </List>
       <Divider />
       <List sx={{ px: 2 }}>
-        <ListItem disablePadding sx={{ mb: 1 }}>
-          <ListItemButton
-            selected={location.pathname === '/settings'}
-            onClick={() => navigate('/settings')}
-            sx={{
-              borderRadius: 2,
-              '&.Mui-selected': {
-                backgroundColor: 'primary.main',
-                color: 'primary.contrastText',
-                '&:hover': {
-                  backgroundColor: 'primary.dark',
-                },
-                '& .MuiListItemIcon-root': {
-                  color: 'primary.contrastText',
-                },
-              },
-            }}
-          >
-            <ListItemIcon
-              sx={{
-                minWidth: 40,
-                color: location.pathname === '/settings' ? 'primary.contrastText' : 'inherit',
-              }}
-            >
-              <SettingsIcon />
-            </ListItemIcon>
-            <ListItemText primary="Settings" />
-          </ListItemButton>
-        </ListItem>
         <ListItem disablePadding>
           <ListItemButton
             onClick={handleLogoutClick}

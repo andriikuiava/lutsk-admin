@@ -9,6 +9,18 @@ export type User = {
   fullName: string;
 };
 
+export type PaidTour = {
+  id: string;
+  title: string;
+};
+
+export type UserInfo = {
+  id: number;
+  email: string;
+  fullName: string | null;
+  paidTours: PaidTour[];
+};
+
 export type Place = {
   id: string;
   title: string;
