@@ -13,6 +13,7 @@ export default function Places() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [editingPlace, setEditingPlace] = useState<Place | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,15 +44,37 @@ export default function Places() {
     }
   };
 
+  const handleEdit = async (id: string) => {
+    try {
+      const response = await places.getById(id);
+      setEditingPlace(response.data);
+      setShowCreate(true);
+    } catch (error) {
+      console.error('Error loading place details:', error);
+      setError('Failed to load place details');
+    }
+  };
+
   const handleSubmit = async (formData: FormData) => {
     try {
-      const response = await places.create(formData);
+      if (editingPlace) {
+        await places.update(editingPlace.id, formData);
+        setSuccess('Place updated successfully');
+      } else {
+        await places.create(formData);
+        setSuccess('Place created successfully');
+      }
       await loadPlaces();
       setShowCreate(false);
-      setSuccess('Place created successfully');
+      setEditingPlace(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create place');
+      setError(err instanceof Error ? err.message : 'Failed to save place');
     }
+  };
+
+  const handleCancel = () => {
+    setShowCreate(false);
+    setEditingPlace(null);
   };
 
   return (
@@ -63,7 +86,10 @@ export default function Places() {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => setShowCreate(!showCreate)}
+          onClick={() => {
+            setEditingPlace(null);
+            setShowCreate(!showCreate);
+          }}
         >
           {showCreate ? 'Cancel' : 'Create Place'}
         </Button>
@@ -71,7 +97,10 @@ export default function Places() {
 
       {showCreate && (
         <Box sx={{ mb: 3 }}>
-          <PlaceForm onSubmit={handleSubmit} />
+          <PlaceForm 
+            onSubmit={handleSubmit} 
+            initialData={editingPlace || undefined}
+          />
         </Box>
       )}
 
@@ -80,6 +109,7 @@ export default function Places() {
           title="Places List"
           data={placesList}
           onDelete={handleDelete}
+          onEdit={handleEdit}
           getItemTitle={(place: Place) => place.title}
           getItemSubtitle={(place: Place) => `${place.type} - ${place.address}`}
           getItemDetails={(place: Place) => ({

@@ -1,19 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Box, Button, Typography, Snackbar, Alert } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import { Add as AddIcon } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import DataDisplay from '../components/DataDisplay';
 import ArticleForm from '../components/forms/ArticleForm';
 import { articles } from '../api/client';
 import type { Article } from '../types/api';
 
 export default function Articles() {
-  const navigate = useNavigate();
   const [showCreate, setShowCreate] = useState(false);
   const [articlesList, setArticlesList] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [editingArticle, setEditingArticle] = useState<Article | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadArticles();
@@ -43,6 +44,17 @@ export default function Articles() {
     }
   };
 
+  const handleEdit = async (id: string) => {
+    try {
+      const response = await articles.getById(id);
+      setEditingArticle(response.data);
+      setShowCreate(true);
+    } catch (error) {
+      console.error('Error loading article details:', error);
+      setError('Failed to load article details');
+    }
+  };
+
   const handleSubmit = async (data: Partial<Article>) => {
     try {
       const articleData = {
@@ -51,23 +63,25 @@ export default function Articles() {
         mainImage: data.mainImage || '',
         contents: data.contents || [],
       };
-      const response = await articles.create(articleData);
+
+      if (editingArticle) {
+        await articles.update(editingArticle.id, articleData);
+        setSuccess('Article updated successfully');
+      } else {
+        await articles.create(articleData);
+        setSuccess('Article created successfully');
+      }
       await loadArticles();
       setShowCreate(false);
-      setSuccess('Article created successfully');
+      setEditingArticle(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create article');
+      setError(err instanceof Error ? err.message : 'Failed to save article');
     }
   };
 
-  const fetchFullDetails = async (id: string) => {
-    try {
-      const response = await articles.getById(id);
-      return response.data;
-    } catch (error) {
-      console.error('Failed to fetch article details:', error);
-      throw error;
-    }
+  const handleCancel = () => {
+    setShowCreate(false);
+    setEditingArticle(null);
   };
 
   return (
@@ -79,7 +93,10 @@ export default function Articles() {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => setShowCreate(!showCreate)}
+          onClick={() => {
+            setEditingArticle(null);
+            setShowCreate(!showCreate);
+          }}
         >
           {showCreate ? 'Cancel' : 'Create Article'}
         </Button>
@@ -87,7 +104,10 @@ export default function Articles() {
 
       {showCreate && (
         <Box sx={{ mb: 3 }}>
-          <ArticleForm onSubmit={handleSubmit} />
+          <ArticleForm 
+            onSubmit={handleSubmit} 
+            initialData={editingArticle || undefined}
+          />
         </Box>
       )}
 
@@ -96,6 +116,7 @@ export default function Articles() {
           title="Articles List"
           data={articlesList}
           onDelete={handleDelete}
+          onEdit={handleEdit}
           getItemTitle={(article: Article) => article.title}
           getItemSubtitle={(article: Article) => `${article.articleType} - ${new Date(article.datePublished).toLocaleString()}`}
           getItemDetails={(article: Article) => ({
@@ -105,7 +126,10 @@ export default function Articles() {
             'Date Published': new Date(article.datePublished).toLocaleString(),
             Contents: article.contents || [],
           })}
-          fetchFullDetails={fetchFullDetails}
+          fetchFullDetails={async (id: string) => {
+            const response = await articles.getById(id);
+            return response.data;
+          }}
         />
       </Box>
 

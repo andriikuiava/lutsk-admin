@@ -8,35 +8,31 @@ import { tours } from '../api/client';
 import type { Tour } from '../types/api';
 
 export default function Tours() {
-  const navigate = useNavigate();
   const [showCreate, setShowCreate] = useState(false);
   const [toursList, setToursList] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [editingTour, setEditingTour] = useState<Tour | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadTours();
   }, []);
 
   const loadTours = async () => {
-    setLoading(true);
-    setError(null);
     try {
       const response = await tours.getAll();
-      // Ensure we have an array of tours
-      setToursList(Array.isArray(response.data) ? response.data : []);
+      setToursList(response.data);
     } catch (error) {
       console.error('Error loading tours:', error);
       setError('Failed to load tours');
-      setToursList([]); // Reset to empty array on error
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    setLoading(true);
     try {
       await tours.delete(id);
       setToursList(prev => prev.filter(tour => tour.id !== id));
@@ -45,43 +41,51 @@ export default function Tours() {
       console.error('Error deleting tour:', error);
       setError('Failed to delete tour');
       throw error;
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  const handleEdit = async (id: string) => {
+    try {
+      const response = await tours.getById(id);
+      setEditingTour(response.data);
+      setShowCreate(true);
+    } catch (error) {
+      console.error('Error loading tour details:', error);
+      setError('Failed to load tour details');
     }
   };
 
   const handleSubmit = async (data: Partial<Tour>) => {
-    setLoading(true);
     try {
       const tourData = {
         title: data.title || '',
         description: data.description || '',
-        coverImage: data.coverImage || '',
         duration: data.duration || '',
+        coverImage: data.coverImage || '',
         latitude: data.latitude || 0,
         longitude: data.longitude || 0,
         startingAddress: data.startingAddress || '',
         stops: data.stops || [],
       };
-      await tours.create(tourData);
+
+      if (editingTour) {
+        await tours.update(editingTour.id, tourData);
+        setSuccess('Tour updated successfully');
+      } else {
+        await tours.create(tourData);
+        setSuccess('Tour created successfully');
+      }
       await loadTours();
       setShowCreate(false);
-      setSuccess('Tour created successfully');
+      setEditingTour(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create tour');
-    } finally {
-      setLoading(false);
+      setError(err instanceof Error ? err.message : 'Failed to save tour');
     }
   };
 
-  const fetchFullDetails = async (id: string) => {
-    try {
-      const response = await tours.getById(id);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching tour details:', error);
-      throw error;
-    }
+  const handleCancel = () => {
+    setShowCreate(false);
+    setEditingTour(null);
   };
 
   return (
@@ -93,8 +97,10 @@ export default function Tours() {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => setShowCreate(!showCreate)}
-          disabled={loading}
+          onClick={() => {
+            setEditingTour(null);
+            setShowCreate(!showCreate);
+          }}
         >
           {showCreate ? 'Cancel' : 'Create Tour'}
         </Button>
@@ -102,7 +108,10 @@ export default function Tours() {
 
       {showCreate && (
         <Box sx={{ mb: 3 }}>
-          <TourForm onSubmit={handleSubmit} />
+          <TourForm 
+            onSubmit={handleSubmit} 
+            initialData={editingTour || undefined}
+          />
         </Box>
       )}
 
@@ -111,8 +120,9 @@ export default function Tours() {
           title="Tours List"
           data={toursList}
           onDelete={handleDelete}
+          onEdit={handleEdit}
           getItemTitle={(tour: Tour) => tour.title}
-          getItemSubtitle={(tour: Tour) => `Product ID: ${tour.productId}, ${tour.stopsCount} stop(s)`}
+          getItemSubtitle={(tour: Tour) => `${tour.duration} - ${tour.startingAddress}`}
           getItemDetails={(tour: Tour) => ({
             ID: tour.id,
             Description: tour.description,
@@ -123,7 +133,10 @@ export default function Tours() {
             'Coordinates': `${tour.latitude}, ${tour.longitude}`,
             Stops: tour.stops || [],
           })}
-          fetchFullDetails={fetchFullDetails}
+          fetchFullDetails={async (id: string) => {
+            const response = await tours.getById(id);
+            return response.data;
+          }}
         />
       </Box>
 

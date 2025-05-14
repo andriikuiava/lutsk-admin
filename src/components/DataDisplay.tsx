@@ -38,6 +38,7 @@ interface DataDisplayProps<T> {
   title: string;
   data: T[];
   onDelete?: (id: string) => Promise<void>;
+  onEdit?: (id: string) => Promise<void>;
   getItemTitle: (item: T) => string;
   getItemSubtitle?: (item: T) => string;
   getItemDetails?: (item: T) => Record<string, any>;
@@ -172,6 +173,7 @@ export default function DataDisplay<T extends { id: string }>({
   title,
   data,
   onDelete,
+  onEdit,
   getItemTitle,
   getItemSubtitle,
   getItemDetails,
@@ -352,54 +354,53 @@ export default function DataDisplay<T extends { id: string }>({
 
   return (
     <Box>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h5" sx={{ mb: 2 }}>
         {title}
       </Typography>
-
-      <Paper>
-        <List>
-          {safeData.map((item, index) => (
-            <Box key={item.id || index}>
-              {index > 0 && <Divider />}
-              <ListItem
-                component="div"
-                sx={{ 
-                  py: 2,
-                  cursor: 'pointer',
-                  '&:hover': {
-                    backgroundColor: 'action.hover',
-                  },
-                }}
+      <List>
+        {data.map((item) => (
+          <ListItem
+            key={item.id}
+            sx={{
+              mb: 2,
+              bgcolor: 'background.paper',
+              borderRadius: 2,
+              boxShadow: 1,
+            }}
+          >
+            <ListItemText
+              primary={getItemTitle(item)}
+              secondary={getItemSubtitle?.(item)}
+            />
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              {onEdit && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => onEdit(item.id)}
+                >
+                  Edit
+                </Button>
+              )}
+              <Button
+                variant="outlined"
+                size="small"
                 onClick={() => handleItemClick(item)}
               >
-                <ListItemText
-                  primary={getItemTitle(item)}
-                  secondary={getItemSubtitle?.(item)}
-                />
-                <ListItemSecondaryAction>
-                  <IconButton
-                    edge="end"
-                    aria-label="view"
-                    onClick={() => handleItemClick(item)}
-                    sx={{ mr: 1 }}
-                  >
-                    <VisibilityIcon />
-                  </IconButton>
-                  {onDelete && (
-                    <IconButton
-                      edge="end"
-                      aria-label="delete"
-                      onClick={() => handleDeleteClick(item.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  )}
-                </ListItemSecondaryAction>
-              </ListItem>
+                View Details
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                size="small"
+                onClick={() => handleDeleteClick(item.id)}
+              >
+                Delete
+              </Button>
             </Box>
-          ))}
-        </List>
-      </Paper>
+          </ListItem>
+        ))}
+      </List>
 
       {/* Details Dialog */}
       <Dialog

@@ -138,6 +138,11 @@ export const places = {
       'Content-Type': 'multipart/form-data',
     },
   }),
+  update: (id: string, formData: FormData) => api.put<Place>(`/places/${id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
   delete: (id: string) => api.delete(`/places/${id}`),
 };
 
@@ -150,6 +155,11 @@ export const events = {
       'Content-Type': 'multipart/form-data',
     },
   }),
+  update: (id: string, formData: FormData) => api.put<Event>(`/events/${id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }),
   delete: (id: string) => api.delete(`/events/${id}`),
 };
 
@@ -158,6 +168,7 @@ export const articles = {
   getAll: () => api.get<Article[]>('/articles'),
   getById: (id: string) => api.get<Article>(`/articles/${id}`),
   create: (data: Omit<Article, 'id' | 'datePublished'>) => api.post<Article>('/articles', data),
+  update: (id: string, data: Omit<Article, 'id' | 'datePublished'>) => api.put<Article>(`/articles/${id}`, data),
   delete: (id: string) => api.delete(`/articles/${id}`),
 };
 
@@ -166,6 +177,7 @@ export const tours = {
   getAll: () => api.get<Tour[]>('/tours'),
   getById: (id: string) => api.get<Tour>(`/tours/${id}`),
   create: (data: Omit<Tour, 'id' | 'datePublished'>) => api.post<Tour>('/tours', data),
+  update: (id: string, data: Omit<Tour, 'id' | 'datePublished'>) => api.put<Tour>(`/tours/${id}`, data),
   delete: (id: string) => api.delete(`/tours/${id}`),
 };
 

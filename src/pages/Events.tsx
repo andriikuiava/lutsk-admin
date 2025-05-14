@@ -13,6 +13,7 @@ export default function Events() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,15 +44,37 @@ export default function Events() {
     }
   };
 
+  const handleEdit = async (id: string) => {
+    try {
+      const response = await events.getById(id);
+      setEditingEvent(response.data);
+      setShowCreate(true);
+    } catch (error) {
+      console.error('Error loading event details:', error);
+      setError('Failed to load event details');
+    }
+  };
+
   const handleSubmit = async (formData: FormData) => {
     try {
-      const response = await events.create(formData);
+      if (editingEvent) {
+        await events.update(editingEvent.id, formData);
+        setSuccess('Event updated successfully');
+      } else {
+        await events.create(formData);
+        setSuccess('Event created successfully');
+      }
       await loadEvents();
       setShowCreate(false);
-      setSuccess('Event created successfully');
+      setEditingEvent(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create event');
+      setError(err instanceof Error ? err.message : 'Failed to save event');
     }
+  };
+
+  const handleCancel = () => {
+    setShowCreate(false);
+    setEditingEvent(null);
   };
 
   return (
@@ -63,7 +86,10 @@ export default function Events() {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => setShowCreate(!showCreate)}
+          onClick={() => {
+            setEditingEvent(null);
+            setShowCreate(!showCreate);
+          }}
         >
           {showCreate ? 'Cancel' : 'Create Event'}
         </Button>
@@ -71,7 +97,10 @@ export default function Events() {
 
       {showCreate && (
         <Box sx={{ mb: 3 }}>
-          <EventForm onSubmit={handleSubmit} />
+          <EventForm 
+            onSubmit={handleSubmit} 
+            initialData={editingEvent || undefined}
+          />
         </Box>
       )}
 
@@ -80,6 +109,7 @@ export default function Events() {
           title="Events List"
           data={eventsList}
           onDelete={handleDelete}
+          onEdit={handleEdit}
           getItemTitle={(event: Event) => event.title}
           getItemSubtitle={(event: Event) => event.description || 'No description available'}
           getItemDetails={(event: Event) => ({
