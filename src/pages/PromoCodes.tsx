@@ -180,16 +180,40 @@ export default function PromoCodes() {
           onDelete={handleDelete}
           onEdit={handleEdit}
           getItemTitle={(promo: PromoCode) => promo.code}
-          getItemSubtitle={(promo: PromoCode) => 
-            `${promo.active ? 'Active' : 'Inactive'} - ${promo.currentActivations}/${promo.maxActivations} activations - Expires: ${new Date(promo.expiryDate).toLocaleDateString()}`
-          }
+          getItemSubtitle={(promo: PromoCode) => (
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box 
+                sx={{ 
+                  width: 10, 
+                  height: 10, 
+                  borderRadius: '50%', 
+                  bgcolor: promo.active ? 'success.main' : 'error.main',
+                  mr: 1
+                }} 
+              />
+              {`${promo.active ? 'Active' : 'Inactive'} - ${promo.currentActivations}/${promo.maxActivations} activations - Expires: ${new Date(promo.expiryDate).toLocaleDateString()}`}
+            </Box>
+          )}
           getItemDetails={(promo: PromoCode) => ({
             ID: promo.id,
             Code: promo.code,
             'Max Activations': promo.maxActivations,
             'Current Activations': promo.currentActivations,
             'Expiry Date': new Date(promo.expiryDate).toLocaleString(),
-            Status: promo.active ? 'Active' : 'Inactive',
+            Status: (
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Box 
+                  sx={{ 
+                    width: 12, 
+                    height: 12, 
+                    borderRadius: '50%', 
+                    bgcolor: promo.active ? 'success.main' : 'error.main',
+                    mr: 1
+                  }} 
+                />
+                {promo.active ? 'Active' : 'Inactive'}
+              </Box>
+            ),
             Tour: getTourName(promo.tourId),
           })}
           fetchFullDetails={async (id: string) => {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   List,
@@ -46,7 +46,7 @@ interface DataDisplayProps<T> {
   onDelete?: (id: string) => Promise<void>;
   onEdit?: (id: string) => Promise<void>;
   getItemTitle: (item: T) => string;
-  getItemSubtitle?: (item: T) => string;
+  getItemSubtitle?: (item: T) => string | React.ReactNode;
   getItemDetails?: (item: T) => Record<string, any>;
   fetchFullDetails: (id: string) => Promise<T>;
   extraActions?: ExtraAction<T>[];
@@ -295,6 +295,11 @@ export default function DataDisplay<T extends { id: string }>({
   };
 
   const renderValue = (key: string, value: any) => {
+    // If the value is already a React node, return it directly
+    if (React.isValidElement(value)) {
+      return value;
+    }
+
     if (key === 'Stops' && Array.isArray(value)) {
       return (
         <Box sx={{ mt: 2 }}>
